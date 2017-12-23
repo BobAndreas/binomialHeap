@@ -14,7 +14,8 @@
                 "-g",
                 "-Wall",
                 "-Wextra",
-                "-pedantic"
+                "-pedantic",
+                "-lm"
             ],
             "group": {
                 "kind": "build",

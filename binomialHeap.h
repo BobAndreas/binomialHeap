@@ -11,7 +11,7 @@ typedef struct heapList{
     struct heapList **last;
 }HeapList;
 
-_Bool emptyList(HeapList *input);
+_Bool isEmpty(HeapList *input);
 
 HeapList *createHeapList();
 
@@ -20,3 +20,5 @@ void addHeapToList(HeapList *current, BinomialHeap *newHeap);
 void addNode(HeapList *current, int newElement);
 
 HeapList *buildHeap(int*input, int length);
+
+void addListElem(HeapList* current, HeapList* newElem);
