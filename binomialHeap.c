@@ -131,14 +131,28 @@ int *createArray(int size){
         a[i] = rand()%1000;
     return a;
 }
+
+void printGrid(int **rows, int width, int depth){
+    for(int i = 0; i<depth; i++){
+        for(int j = 0; j<width; j++){
+            if(rows[i][j]>-1)printf("%4d", rows[i][j]);
+            else printf("    ");
+        }
+        printf("\n");
+    }
+}
+
 void fillArrayStructure(int **rows, BinomialHeap *curHeap, int rightTurns, int deviation, int shift){
     switch(curHeap->order){
         case 0: 
             rows[rightTurns][deviation+shift] = curHeap->number;
+            //only for debuging / visualisation purposes
+            //printGrid(rows, 50, 5);
             break;
         case 1:
             fillArrayStructure(rows, curHeap->left, rightTurns, deviation, shift);
             fillArrayStructure(rows, curHeap->right, rightTurns+1, deviation, shift);
+            break;
         default:
             fillArrayStructure(rows, curHeap->left, rightTurns, deviation*2, shift);
             fillArrayStructure(rows, curHeap->right, rightTurns+1, deviation*2+1, shift);
@@ -150,13 +164,15 @@ void printHeap(HeapList *heap){
     double a = 3.0;
     pow(2.0, a);
     HeapList *iterator = heap;
+    /*
     int width = 0;
-    double intermediate;
     while(iterator != NULL){
-        intermediate = iterator->content->order-1;
-        width += (int)(pow(2.0, intermediate)+0.8); //hack for 0 => 1, 1 => 1, 2=>2, 3=>4 ... 
+        width += (int)(pow(2.0, iterator->content->order-1)+0.8)+1; //hack for 0 => 1, 1 => 1, 2=>2, 3=>4 ... 
         iterator = iterator->next;
     }
+    */
+    //just for test
+    int width = 50;
     int depth = heap->content->order +1;
     int **rows = malloc(sizeof(int*)*depth);
     for(int i = 0; i<depth; i++){
@@ -171,20 +187,11 @@ void printHeap(HeapList *heap){
     iterator = heap;
     int shift=0;
     while(iterator != NULL){
-        intermediate = iterator->content->order-1;
         fillArrayStructure(rows, iterator->content, 0, 0, shift);
-        shift += (int)(pow(2.0, intermediate)+0.8); //hack for 0 => 1, 1 => 1, 2=>2, 3=>4 ... 
+        shift += (int)(pow(2.0, iterator->content->order-1)+0.8)+1; //hack for 0 => 1, 1 => 1, 2=>2, 3=>4 ... 
         iterator = iterator->next;
     }
-    //fill array structure
-
-    for(int i = 0; i<depth; i++){
-        for(int j = 0; j<width; j++){
-            if(rows[i][j]>-1)printf("%4d", rows[i][j]);
-            else printf("    ");
-        }
-        printf("\n");
-    }
+    printGrid(rows, width, depth);
     //end print
     /*
     for(int i = 0; i<depth; i++)
