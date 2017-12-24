@@ -9,14 +9,21 @@
             "preLaunchTask": "build_c",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/${fileBasenameNoExtension}.out",
-            "args": [],
+            "linux": {
+                "program": "${workspaceFolder}/${fileBasenameNoExtension}.out",
+                "args": [],
+                "miDebuggerPath": "/usr/bin/gdb",
+            },
+            "windows": {
+                "program": "${workspaceFolder}/${fileBasenameNoExtension}.exe",
+                "args": [],
+                "miDebuggerPath": "C:\\cygwin64\\bin\\gdb.exe",
+            },
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": true,
             "MIMode": "gdb",
-            "miDebuggerPath": "/usr/bin/gdb",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",

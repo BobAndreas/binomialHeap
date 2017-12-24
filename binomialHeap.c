@@ -132,12 +132,17 @@ int *createArray(int size){
     return a;
 }
 void fillArrayStructure(int **rows, BinomialHeap *curHeap, int rightTurns, int deviation, int shift){
-    if(curHeap->order == 0){
-        rows[rightTurns][deviation+shift] = curHeap->number;
-    }
-    else{
-        fillArrayStructure(rows, curHeap->left, rightTurns, deviation*2, shift);
-        fillArrayStructure(rows, curHeap->right, rightTurns+1, deviation*2+1, shift);
+    switch(curHeap->order){
+        case 0: 
+            rows[rightTurns][deviation+shift] = curHeap->number;
+            break;
+        case 1:
+            fillArrayStructure(rows, curHeap->left, rightTurns, deviation, shift);
+            fillArrayStructure(rows, curHeap->right, rightTurns+1, deviation, shift);
+        default:
+            fillArrayStructure(rows, curHeap->left, rightTurns, deviation*2, shift);
+            fillArrayStructure(rows, curHeap->right, rightTurns+1, deviation*2+1, shift);
+            break;
     }
 }
 
@@ -191,15 +196,21 @@ void printHeap(HeapList *heap){
 int main(){
     srand(1000);
     while(true){
-        uint control;
+        unsigned int control;
         scanf("%u", &control);
         if(control){
             int arrayInput1[17] = {65, 12, 33, 11, 77, 31, 80, 37, 19, 22, 5, 16, 30, 22, 26, 60, 62};
             int arrayInput2[11] = {10, 5, 18, 3, 19, 6, 15, 2, 14, 4, 1};
             HeapList *heap1 = buildHeap(arrayInput1, 17);
+            printf("Heap 1\n");
+            printHeap(heap1);
+            printf("\n\nHeap2\n");
             HeapList *heap2 = buildHeap(arrayInput2, 11);
+            printHeap(heap2);
+            printf("\n\nHeap 3\n");
             HeapList *heap3 = Union(heap1, heap2);
             printHeap(heap3);
+            printf("\n");
             int a = 2;
             //task
             

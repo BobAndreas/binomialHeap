@@ -6,17 +6,32 @@
         {
             "label": "build_c",
             "type": "shell",
-            "command": "gcc",
-            "args": [
-                "${file}",
-                "-o",
-                "${fileBasenameNoExtension}.out",
-                "-g",
-                "-Wall",
-                "-Wextra",
-                "-pedantic",
-                "-lm"
-            ],
+            "linux": {
+                "command": "gcc",
+                "args": [
+                    "${file}",
+                    "-o",
+                    "${fileBasenameNoExtension}.out",
+                    "-g",
+                    "-Wall",
+                    "-Wextra",
+                    "-pedantic",
+                    "-lm"
+                ],
+            },
+            "windows": {
+                "command": "gcc",
+                "args": [
+                    "${file}",
+                    "-o",
+                    "${fileBasenameNoExtension}.exe",
+                    "-g",
+                    "-Wall",
+                    "-Wextra",
+                    "-pedantic",
+                    "-lm"
+                ],
+            },
             "group": {
                 "kind": "build",
                 "isDefault": true
