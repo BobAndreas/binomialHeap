@@ -30,10 +30,14 @@ void freeList(HeapList *list){
         freeList(list);
     free(list);
 }
-void deconstructList(HeapList *list){
+
+
+void deconstructList(HeapList *list, _Bool includingHeap){
     if(list->next != NULL)
         freeList(list->next);
-    free(list->last);
+    else
+        free(list->last);
+    if(includingHeap)free(list->content);
     free(list);
 }
 //adds a new Heap to the List on top of the binomial Heap
@@ -42,7 +46,7 @@ void addHeapToList(HeapList *current, BinomialHeap *newHeap){
     newListElement->content = newHeap;
     addListElem(current, newListElement); 
 }
-
+//adds an heap to the end of the list of childs of an bigger heap
 void addAsSibbling(BinomialHeap *child, BinomialHeap *newChild){
     if(child->sibbling == NULL)
         child->sibbling = newChild;
@@ -83,7 +87,7 @@ void correctHeapList(HeapList *list){
     }
 
 }
-//adds a new node in the binomial heap for the added number
+//creates a new heap and appends it to the root list
 void addNode(HeapList *current, int newElement){
     BinomialHeap *newHeap = malloc(sizeof(BinomialHeap));
     newHeap->child = NULL;
@@ -119,11 +123,11 @@ void addListElem(HeapList* current, HeapList* newElem){
 //merge two binomial heap lists;
 HeapList *Union(HeapList *list1, HeapList *list2){
     if(isEmpty(list1)){
-        deconstructList(list1);
+        deconstructList(list1, false);
         return list2;
     }
     if(isEmpty(list2)){
-        deconstructList(list2);
+        deconstructList(list2, false);
         return list1;
     }
     free(list2->last);
