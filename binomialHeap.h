@@ -12,6 +12,12 @@ typedef struct heapList{
     struct heapList **last;
 }HeapList;
 
+typedef struct int_ptr_ptr_tuple{
+    int value;
+    HeapList *smallest;
+    HeapList *front;
+}IntPtrPtr_Tuple;
+
 _Bool isEmpty(HeapList *input);
 
 HeapList *createHeapList();
@@ -22,4 +28,4 @@ void addNode(HeapList *current, int newElement);
 
 HeapList *buildHeap(int*input, int length);
 
-void addListElem(HeapList* current, HeapList* newElem);
+void addList(HeapList* current, HeapList* newElem);
