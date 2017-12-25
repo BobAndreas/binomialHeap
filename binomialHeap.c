@@ -24,7 +24,15 @@ HeapList *createHeapList(){
     *newList->last = newList;
     return newList;
 }
+
+void freeList(HeapList *list){
+    if(!EOL(list))
+        freeList(list);
+    free(list);
+}
 void deconstructList(HeapList *list){
+    if(list->next != NULL)
+        freeList(list->next);
     free(list->last);
     free(list);
 }
@@ -35,28 +43,33 @@ void addHeapToList(HeapList *current, BinomialHeap *newHeap){
     addListElem(current, newListElement); 
 }
 
-int readSmallest(BinomialHeap *heap){
-    if(heap->order)
-        return readSmallest(heap->left);
-    return heap->number;
+void addAsSibbling(BinomialHeap *child, BinomialHeap *newChild){
+    if(child->sibbling == NULL)
+        child->sibbling = newChild;
+    else
+        addAsSibbling(child->sibbling, newChild);
 }
-
 //correct the heaplist after appending a new element to restore the binomial heap;
 void correctHeapList(HeapList *list){
     if(!EOL(list)){
         correctHeapList(list->next);
         if(list->content->order == list->next->content->order){
-            BinomialHeap *newHeap = malloc(sizeof(BinomialHeap));
-            if(readSmallest(list->content) <= readSmallest(list->next->content)){
-                newHeap->left = list->content;
-                newHeap->right = list->next->content;
+            BinomialHeap *smaller;
+            BinomialHeap *bigger;
+            if(list->content->number <= list->next->content->number){
+                smaller = list->content;
+                bigger = list->next->content;
             }
             else{
-                newHeap->left = list->next->content;
-                newHeap->right = list->content;
+                smaller = list->next->content;
+                bigger = list->content;
             }
-            newHeap->order = list->content->order + 1;
-            list->content = newHeap;
+            smaller->order++;
+            list->content = smaller;
+            if(smaller->child != NULL)
+                addAsSibbling(smaller->child, bigger);
+            else
+                smaller->child = bigger;
             HeapList *cache = list->next;
             list->next = list->next->next;
             free(cache);
@@ -73,8 +86,9 @@ void correctHeapList(HeapList *list){
 //adds a new node in the binomial heap for the added number
 void addNode(HeapList *current, int newElement){
     BinomialHeap *newHeap = malloc(sizeof(BinomialHeap));
-    newHeap->left = NULL;
-    newHeap->right = NULL;
+    newHeap->child = NULL;
+    newHeap->parent = NULL;
+    newHeap->sibbling = NULL;
     newHeap->order = 0;
     newHeap->number = newElement;
     addHeapToList(current, newHeap);
@@ -142,62 +156,46 @@ void printGrid(int **rows, int width, int depth){
     }
 }
 
-void fillArrayStructure(int **rows, BinomialHeap *curHeap, int rightTurns, int deviation, int shift){
-    switch(curHeap->order){
-        case 0: 
-            rows[rightTurns][deviation+shift] = curHeap->number;
-            //only for debuging / visualisation purposes
-            //printGrid(rows, 50, 5);
-            break;
-        case 1:
-            fillArrayStructure(rows, curHeap->left, rightTurns, deviation, shift);
-            fillArrayStructure(rows, curHeap->right, rightTurns+1, deviation, shift);
-            break;
-        default:
-            fillArrayStructure(rows, curHeap->left, rightTurns, deviation*2, shift);
-            fillArrayStructure(rows, curHeap->right, rightTurns+1, deviation*2+1, shift);
-            break;
-    }
+int heapWidth(BinomialHeap *heap){
+    return(int)(pow(2.0, heap->order-1)+0.8);//hack for 0 => 1, 1 => 1, 2=>2, 3=>4 ... 
 }
 
+void fillArrayStructure(int **rows, BinomialHeap *curHeap, int level, int deviation){
+    rows[level][deviation] = curHeap->number;
+    if(curHeap->sibbling != NULL)fillArrayStructure(rows, curHeap->sibbling, level, deviation + heapWidth(curHeap));
+    if(curHeap->child != NULL)fillArrayStructure(rows, curHeap->child, level +1, deviation);
+}
+
+
 void printHeap(HeapList *heap){
-    double a = 3.0;
-    pow(2.0, a);
+   
     HeapList *iterator = heap;
-    /*
     int width = 0;
     while(iterator != NULL){
-        width += (int)(pow(2.0, iterator->content->order-1)+0.8)+1; //hack for 0 => 1, 1 => 1, 2=>2, 3=>4 ... 
+        width += heapWidth(iterator->content)+1;
         iterator = iterator->next;
     }
-    */
-    //just for test
-    int width = 50;
     int depth = heap->content->order +1;
     int **rows = malloc(sizeof(int*)*depth);
     for(int i = 0; i<depth; i++){
         rows[i] = malloc(sizeof(int)*width);
-    }
-    for(int i = 0; i<depth; i++){
+        
         for(int j = 0; j<width; j++){
             rows[i][j] = -1;
         }
     }
-    //do print
     iterator = heap;
     int shift=0;
     while(iterator != NULL){
-        fillArrayStructure(rows, iterator->content, 0, 0, shift);
-        shift += (int)(pow(2.0, iterator->content->order-1)+0.8)+1; //hack for 0 => 1, 1 => 1, 2=>2, 3=>4 ... 
+        fillArrayStructure(rows, iterator->content, 0, shift);
+        shift += heapWidth(iterator->content)+1; 
         iterator = iterator->next;
     }
     printGrid(rows, width, depth);
-    //end print
-    /*
+    
     for(int i = 0; i<depth; i++)
         free(rows[i]);
     free(rows);
-    */
 }
 
 int main(){

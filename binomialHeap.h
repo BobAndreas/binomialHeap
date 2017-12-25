@@ -1,7 +1,8 @@
 typedef struct bHeap{
     int order;
-    struct bHeap *left;
-    struct bHeap *right;
+    struct bHeap *child;
+    struct bHeap *parent;
+    struct bHeap *sibbling;
     int number;
 }BinomialHeap;
 
